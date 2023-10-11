@@ -4,12 +4,17 @@ date = "2017-09-12T14:49:27Z"
 draft = false
 +++
 
-<!--kg-card-begin: markdown--><p>I've been using the default yaml/jinja combo for most of the time that I've used Saltstack, which can get really frustrating when you're moving away from simple templating and actually starting to develop code in jinja. The biggest issue here: jinja is a <em>templating</em> engine, not a programming language. It is not easy to debug, and frankly, it is incredibly ugly!</p>
-<p>Enter <a href="https://docs.saltstack.com/en/latest/ref/renderers/all/salt.renderers.pyobjects.html#module-salt.renderers.pyobjects">pyobjects</a> - one of the most pythonic renderers available, providing the power and flexibility of python to your configurations! It doesn't hurt that SaltStack is written in python, making this renderer very simple to implement.</p>
-<p>UPDATE: <a href="https://github.com/BadgerOps/salt-workspace/tree/feature/pyobjects_host_example">here</a> is a branch in <a href="__GHOST_URL__/2017/04/10/getting-started-with-salt-workspace/">salt-workspace</a> that shows example code that you can download and run yourself!</p>
-<hr>
-<p>Initially, I created a template for my <code>/etc/hosts</code> file with jinja:</p>
-<pre><code># set local ip/hostname by looking at 2 grains, grabbing the ip associated with eth0 (returned as a list, so we have to pull [0])
+I've been using the default yaml/jinja combo for most of the time that I've used Saltstack, which can get really frustrating when you're moving away from simple templating and actually starting to develop code in jinja. The biggest issue here: jinja is a *templating* engine, not a programming language. It is not easy to debug, and frankly, it is incredibly ugly!
+
+Enter [pyobjects](https://docs.saltstack.com/en/latest/ref/renderers/all/salt.renderers.pyobjects.html#module-salt.renderers.pyobjects) - one of the most pythonic renderers available, providing the power and flexibility of python to your configurations! It doesn't hurt that SaltStack is written in python, making this renderer very simple to implement. 
+
+UPDATE: [here](https://github.com/BadgerOps/salt-workspace/tree/feature/pyobjects_host_example) is a branch in [salt-workspace](__GHOST_URL__/2017/04/10/getting-started-with-salt-workspace/) that shows example code that you can download and run yourself!
+
+----
+
+Initially, I created a template for my `/etc/hosts` file with jinja:
+```
+# set local ip/hostname by looking at 2 grains, grabbing the ip associated with eth0 (returned as a list, so we have to pull [0])
 # also grabbing the hostname from the 'host' grain. We set this here instead of using salt-mine just in case the salt-mine cache gets into a bad state
 # we don't want to break local resolving.
 {{ grains['ip4_interfaces'][interface][0] }} {{ grains['host'] }}
@@ -23,33 +28,51 @@ draft = false
 {{ ip[0] }} {{ hostname }}
 {% endif -%}
 {% endfor %}
-</code></pre>
-<p>What we do here with <a href="https://docs.saltstack.com/en/latest/topics/mine/">salt-mine</a> is have the minions register their IP addresses using a pillar declaration:</p>
-<pre><code>mine_functions:
+```
+
+What we do here with [salt-mine](https://docs.saltstack.com/en/latest/topics/mine/) is have the minions register their IP addresses using a pillar declaration:
+```
+mine_functions:
   # we build our /etc/hosts file off the private IP's
   network.ip_addrs:
     interface: eth0
-</code></pre>
-<p>This allows us to do a mine lookup <code>salt['mine.get']('*', 'network.ip_addrs')</code> which would return a dictionary that looks something like this:</p>
-<pre><code>&gt;&gt;&gt; salt('*', 'mine.get', ('*', 'network.ip_addrs'))
+```
+This allows us to do a mine lookup `salt['mine.get']('*', 'network.ip_addrs')` which would return a dictionary that looks something like this:
+
+```
+>>> salt('*', 'mine.get', ('*', 'network.ip_addrs'))
 {'saltmaster': {'saltmaster': ['192.168.50.4'], 'linux-1': ['192.168.50.5']}, 'linux-1': {'saltmaster': ['192.168.50.4'], 'linux-1': ['192.168.50.5']}}
-</code></pre>
-<p>breaking this down: <code>salt('*'</code> is functionally the same as <code>salt '*'</code> meaning we run the command on all minions. Then we have the <code>mine.get</code> function, where we pass in <code>('*', 'network.ip_addrs')</code> as arguments. This mean's we're requesting network.ip_addrs from all the minions. As usual, if you <a href="https://docs.saltstack.com/en/latest/topics/mine/#example">read the documentation</a> you should have a better understanding of how to get information back out of salt-mine.</p>
-<p>We could technically run that against a single machine, say <code>saltmaster</code> for example:</p>
-<pre><code>&gt;&gt;&gt; salt('saltmaster', 'mine.get', ('*', 'network.ip_addrs'))
+```
+
+breaking this down: `salt('*'` is functionally the same as `salt '*'` meaning we run the command on all minions. Then we have the `mine.get` function, where we pass in `('*', 'network.ip_addrs')` as arguments. This mean's we're requesting network.ip_addrs from all the minions. As usual, if you [read the documentation](https://docs.saltstack.com/en/latest/topics/mine/#example) you should have a better understanding of how to get information back out of salt-mine.
+
+We could technically run that against a single machine, say `saltmaster` for example:
+
+```
+>>> salt('saltmaster', 'mine.get', ('*', 'network.ip_addrs'))
 {'saltmaster': {'saltmaster': ['192.168.50.4'], 'linux-1': ['192.168.50.5']}
-</code></pre>
-<p>we'd just get a single dictionary back with the same values (assuming they all registered correctly)</p>
-<p>If you were running this from the command line, it would look like:</p>
-<pre><code>salt 'saltmaster' mine.get '*' network.ip_addrs
-</code></pre>
-<p>or:</p>
-<pre><code>salt 'saltmaster' mine.get 'saltmaster' network.ip_addrs
-</code></pre>
-<p>Back to the <code>/etc/hosts</code> template file. Jinja is kind of tricky to work with, and is really difficult to debug, which is something I ran into when working with this project.</p>
-<p>I decided to give the <code>#!pyobjects</code> renderer a shot, and was pleased to find it was really easy to mock out using the <a href="https://docs.python.org/3/tutorial/interpreter.html#">idle</a> interpreter.</p>
-<p>Here is the file I ended up with, which enabled me to dynamically add/remove hosts using straight up python syntax. I've added a bunch of documentation so hopefully it should be fairly obvious what is going on, but feel free to add a comment or feel free to reach out <code>@badgerops</code> on the twitters.</p>
-<pre><code>#!pyobjects
+```
+we'd just get a single dictionary back with the same values (assuming they all registered correctly)
+
+If you were running this from the command line, it would look like:
+
+```
+salt 'saltmaster' mine.get '*' network.ip_addrs
+```
+or:
+
+```
+salt 'saltmaster' mine.get 'saltmaster' network.ip_addrs
+```
+
+Back to the `/etc/hosts` template file. Jinja is kind of tricky to work with, and is really difficult to debug, which is something I ran into when working with this project.
+
+I decided to give the `#!pyobjects` renderer a shot, and was pleased to find it was really easy to mock out using the [idle](https://docs.python.org/3/tutorial/interpreter.html#) interpreter.
+
+Here is the file I ended up with, which enabled me to dynamically add/remove hosts using straight up python syntax. I've added a bunch of documentation so hopefully it should be fairly obvious what is going on, but feel free to add a comment or feel free to reach out `@badgerops` on the twitters.
+
+```
+#!pyobjects
 
 # the purpose of this builder is to create a hostfile in the following format:
 # 1.2.3.4    hostname    hostname.domain
@@ -80,7 +103,8 @@ for hostname in network.keys():
             ]
     )
 
-</code></pre>
-<p>Hope this was helpful!</p>
-<p>-BadgerOps</p>
-<!--kg-card-end: markdown-->
+```
+
+Hope this was helpful!
+
+-BadgerOps
