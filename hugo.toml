@@ -1,4 +1,48 @@
 baseURL = 'https://blog.badgerops.net/'
 languageCode = 'en-us'
 title = "BadgerOps' Blog"
-theme = 'ananke'
+theme = 'hugo-bearblog'
+
+[params]
+  dateform        = "Jan 2, 2006"
+  dateformShort   = "Jan 2"
+  dateformNum     = "2006-01-02"
+  dateformNumTime = "2006-01-02 15:04"
+# The "description" of your website. This is used in the meta data of your generated html.
+  description = "Hugo + Bear = :heart:"
+  # Subtitle for home
+  homeSubtitle = "A simple and beautiful blog"
+
+  # Set disableReadOtherPosts to true in order to hide the links to other posts.
+  disableReadOtherPosts = false
+
+  # Enable sharing buttons, if you like
+  enableSharingButtons = true
+  
+  # Show a global language switcher in the navigation bar
+  enableGlobalLanguageMenu = true
+
+  keywords = "homepage, blog"
+  images = [""]
+
+# Generate a nice robots.txt for SEO
+enableRobotsTXT = true
+
+[taxonomies]
+    category = "blog"
+    tag      = "tags"
+    series   = "series"
+
+
+  # And you can even create generic menu
+  [[menu.main]]
+    identifier = "blog"
+    name       = "Blog"
+    url        = "/posts"
+
+# Generate "Bearblog"-like URLs !only!, see https://bearblog.dev/.
+#disableKinds = ["taxonomy"]
+ignoreErrors = ["error-disable-taxonomy"]
+[permalinks]
+  blog = "/:slug/"
+  tags = "/blog/:slug"
