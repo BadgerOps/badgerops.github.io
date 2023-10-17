@@ -12,7 +12,7 @@ GPG encrypted Pillar is similar to encrypted data bags if you're coming from Che
 
 As usual, I'll say: [Read.The.Docs](https://docs.saltstack.com/en/latest/ref/renderers/all/salt.renderers.gpg.html). (They're excellent!) But sometimes, its nice to be able to experiment with an environment hence why I'm sitting here sipping some delicious Laphroaig typing words with my fingers... But I'm getting sidetracked. On to the demo code!
 
-Once again, assuming you've already set up your [salt workspace](__GHOST_URL__/2017/04/10/getting-started-with-salt-workspace/) you can follow along here by checking out the `minimal_base` branch, or the `feature/gpg_example` branch to see the completed setup.
+Once again, assuming you've already set up your [salt workspace](blog.badgerops.net/2017/04/10/getting-started-with-salt-workspace/) you can follow along here by checking out the `minimal_base` branch, or the `feature/gpg_example` branch to see the completed setup.
 
 The first thing you'll want to do is create the folder for the gpg key:
 ```

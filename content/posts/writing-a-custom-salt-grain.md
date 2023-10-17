@@ -39,7 +39,7 @@ You'll create a file at salt/\_grains/primary\_ipv4.py and put the contents of t
 
 ##### Example of how to test the thing
 
-Assuming you've got the [salt-workspace](__GHOST_URL__/2017/04/10/getting-started-with-salt-workspace/) set up, you can start up the saltmaster and the linux-1 VM: `vagrant up saltmaster linux-1`
+Assuming you've got the [salt-workspace](blog.badgerops.net/2017/04/10/getting-started-with-salt-workspace/) set up, you can start up the saltmaster and the linux-1 VM: `vagrant up saltmaster linux-1`
 
 Then, ensure you run `make` to build the salt structure and move it to ./dist/ which is sync'd to the saltmaster VM.
 

@@ -6,7 +6,7 @@ draft = false
 
 ##### Edit in March of 2020: Hello! This is one of my more popular posts even in 2020, but I'm curious if you came across this post looking for slightly different information than is presented. If so, shoot me a message on twitter: `@badgerops` or send an email to `blog@badgerops.net` with what you're looking for so I can update this post! Thank you.
 -----------------------------------
-Today we're going to talk about using salt-mine to help gather information from salt minions. This is a sister post to [Using the #!pyobjects renderer](__GHOST_URL__/2018/02/09/using-the-saltstack-pyobjects-renderer/) as we're consuming mine data to create a custom hosts file.
+Today we're going to talk about using salt-mine to help gather information from salt minions. This is a sister post to [Using the #!pyobjects renderer](blog.badgerops.net/2018/02/09/using-the-saltstack-pyobjects-renderer/) as we're consuming mine data to create a custom hosts file.
 
 In this example, we're going to register our IP addresses that match a specific IP address pattern, or [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) using [salt-mine](https://docs.saltstack.com/en/latest/topics/mine/)
  
