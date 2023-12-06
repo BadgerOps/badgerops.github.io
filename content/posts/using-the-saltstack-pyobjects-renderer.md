@@ -8,7 +8,7 @@ I've been using the default yaml/jinja combo for most of the time that I've used
 
 Enter [pyobjects](https://docs.saltstack.com/en/latest/ref/renderers/all/salt.renderers.pyobjects.html#module-salt.renderers.pyobjects) - one of the most pythonic renderers available, providing the power and flexibility of python to your configurations! It doesn't hurt that SaltStack is written in python, making this renderer very simple to implement. 
 
-UPDATE: [here](https://github.com/BadgerOps/salt-workspace/tree/feature/pyobjects_host_example) is a branch in [salt-workspace](__GHOST_URL__/2017/04/10/getting-started-with-salt-workspace/) that shows example code that you can download and run yourself!
+UPDATE: [here](https://github.com/BadgerOps/salt-workspace/tree/feature/pyobjects_host_example) is a branch in [salt-workspace](blog.badgerops.net/2017/04/10/getting-started-with-salt-workspace/) that shows example code that you can download and run yourself!
 
 ----
 

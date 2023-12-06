@@ -4,7 +4,7 @@ date = "2017-04-09T00:49:51Z"
 draft = false
 +++
 
-###### Note: please complete the [getting started with salt workspace](__GHOST_URL__/2017/04/10/getting-started-with-salt-workspace/) post first!
+###### Note: please complete the [getting started with salt workspace](blog.badgerops.net/2017/04/10/getting-started-with-salt-workspace/) post first!
 
 ###### Note #2: 
 
@@ -158,7 +158,7 @@ While this may seem overly complex right now for a single Formula, we'll build o
 
 On the Pillar side, the [top.sls](https://github.com/BadgerOps/salt-workspace/blob/master/pillar/top.sls) is similar to the top.sls for the States (Salt) directory.
 
-We could target Minions directly with top files, hopefully you already got your [workspace](__GHOST_URL__/2017/04/10/getting-started-with-salt-workspace/) up and running because now its time to get your hands dirty! (Take a second to ensure its up and you're logged in to the saltmaster VM) 
+We could target Minions directly with top files, hopefully you already got your [workspace](blog.badgerops.net/2017/04/10/getting-started-with-salt-workspace/) up and running because now its time to get your hands dirty! (Take a second to ensure its up and you're logged in to the saltmaster VM) 
 
 ###### Note: 
 if you're not using a directory watch tool as noted in the Readme.md, you'll have to manually run 'make' to push any code changes to the saltmaster VM. Open up a second tab and cd to the salt-workspace directory so you can easily run the make command without having to constantly log in and out of the saltmaster VM.

@@ -8,7 +8,7 @@ Hello fine readers,
 
 Chances are you're scouring the googles much like I was all morning trying to figure out how to get `update-initramfs` to pull in the `70-persistent-net.rules` udev rule.
 
-You may have stumbled on [this debian bug](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=618420) or [this ubuntu bug](https://bugs.launchpad.net/ubuntu/+source/initramfs-tools/+bug/1471391) which coincidently ties in with my [remote LUKS unlocking](__GHOST_URL__/2018/01/16/using-dropbear-ssh-daemon-to-enable-remote-luks-unlocking/) post.
+You may have stumbled on [this debian bug](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=618420) or [this ubuntu bug](https://bugs.launchpad.net/ubuntu/+source/initramfs-tools/+bug/1471391) which coincidently ties in with my [remote LUKS unlocking](blog.badgerops.net/2018/01/16/using-dropbear-ssh-daemon-to-enable-remote-luks-unlocking/) post.
 
 I quickly found that `NEED_PERSISTENT_NET=yes` needed to be set, but it wasn't immediately obvious _where_ that needed to be set as `update-initramfs` ignores environment variables. Well, I finally [tracked down](https://git.devuan.org/jaretcantu/eudev/blob/9dc53b6a06d64e349ee1aa9a69b022586eea95ab/debian/udev.README.Debian#L146)  a reference to where you can set that variable.
 ###### NOTE:
