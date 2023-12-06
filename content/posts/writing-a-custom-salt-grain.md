@@ -22,7 +22,7 @@ Create a [directory](https://github.com/BadgerOps/salt-workspace/blob/custom_gra
 
 [This](https://github.com/BadgerOps/salt-workspace/blob/custom_grain/salt/_grains/primary_ip4.py) is a (very simple) example of the contents of the primary_ipv4 Grain:
 
-```
+```python
 #!/usr/bin/env python
 import subprocess
 
@@ -39,20 +39,23 @@ You'll create a file at salt/\_grains/primary\_ipv4.py and put the contents of t
 
 ##### Example of how to test the thing
 
-Assuming you've got the [salt-workspace](__GHOST_URL__/2017/04/10/getting-started-with-salt-workspace/) set up, you can start up the saltmaster and the linux-1 VM: `vagrant up saltmaster linux-1`
+Assuming you've got the [salt-workspace](https://blog.badgerops.net/2017/04/10/getting-started-with-salt-workspace/) set up, you can start up the saltmaster and the linux-1 VM: `vagrant up saltmaster linux-1`
 
 Then, ensure you run `make` to build the salt structure and move it to ./dist/ which is sync'd to the saltmaster VM.
 
 Log into the saltmaster and run `salt \* saltutil.sync_grains` which will synchronize the grains across all nodes. You should see the following output:
-```
+
+```bash
 [vagrant@saltmaster ~]$ sudo salt \* saltutil.sync_grains
 saltmaster:
     - grains.primary_ip4
 linux-1:
     - grains.primary_ip4
 ```
+
 Then you should be able to run `salt \* grains.get primary_ipv4` as seen below:
-```
+
+```bash
 [vagrant@saltmaster ~]$ sudo salt \* grains.get primary_ipv4
 saltmaster:
     10.0.2.15
