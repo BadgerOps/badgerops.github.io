@@ -28,10 +28,10 @@ theme = 'hugo-bearblog'
 # Generate a nice robots.txt for SEO
 enableRobotsTXT = true
 
-[taxonomies]
-    category = "blog"
-    tag      = "tags"
-    series   = "series"
+# [taxonomies]
+#     category = "blog"
+#     tag      = "tags"
+#     series   = "series"
 
 
   # And you can even create generic menu
