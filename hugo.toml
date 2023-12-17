@@ -39,7 +39,8 @@ enableRobotsTXT = true
     identifier = "blog"
     name       = "Blog"
     url        = "/posts"
-
+    
+{{- range ( where site.RegularPages "Section" "blog" | first 3 ) }}
 # Generate "Bearblog"-like URLs !only!, see https://bearblog.dev/.
 #disableKinds = ["taxonomy"]
 ignoreErrors = ["error-disable-taxonomy"]
