@@ -1,0 +1,92 @@
+{{ define "main" }}
+{{ $posts := where site.RegularPages "Section" "posts" }}
+{{ $posts = $posts.ByDate.Reverse }}
+<section class="hero shell">
+  <div class="hero-copy">
+    <div class="eyebrow"><i></i> Infrastructure · Security · Systems</div>
+    <h1>Build it. Break it.<br><em>Write down what survived.</em></h1>
+    <p>{{ site.Params.description }}</p>
+    <div class="hero-actions">
+      <a class="button button-primary" href="{{ "/posts/" | relURL }}">Browse field notes <span>↗</span></a>
+      <a class="button button-quiet" href="{{ site.Params.github }}" target="_blank" rel="noopener">Explore the code</a>
+    </div>
+  </div>
+  <div class="hero-terminal" aria-label="A terminal-style description of BadgerOps">
+    <div class="terminal-bar"><span></span><span></span><span></span><b>badger@homelab:~</b></div>
+    <div class="terminal-body">
+      <p><span class="prompt">$</span> whoami</p>
+      <p class="terminal-output">operator · builder · chronic documenter</p>
+      <p><span class="prompt">$</span> find ./notes -type f | tail -4</p>
+      <ul>
+        <li><span>01</span> infrastructure that explains itself</li>
+        <li><span>02</span> security without the theater</li>
+        <li><span>03</span> homelab experiments in production</li>
+        <li><span>04</span> lessons found the hard way</li>
+      </ul>
+      <p class="terminal-cursor"><span class="prompt">$</span> <i></i></p>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <span><strong>{{ len $posts }}</strong> published notes</span>
+    <span><strong>{{ (index (last 1 $posts) 0).Date.Format "2006" }}</strong> first dispatch</span>
+    <span><strong>100%</strong> source available</span>
+  </div>
+</section>
+
+{{ with index $posts 0 }}
+<section class="featured shell">
+  <div class="section-heading">
+    <div><span class="section-number">01</span><span class="eyebrow">Latest dispatch</span></div>
+    <a href="{{ "/posts/" | relURL }}">All writing <span>↗</span></a>
+  </div>
+  <article class="featured-card">
+    <a class="card-link" href="{{ .RelPermalink }}" aria-label="Read {{ .Title }}"></a>
+    <div class="featured-index"><span>NEW</span><b>{{ .Date.Format "2006.10" }}</b></div>
+    <div class="featured-copy">
+      <div class="card-topline">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time>
+        <span>{{ .ReadingTime }} min read</span>
+      </div>
+      <h2>{{ .Title }}</h2>
+      <p>{{ with .Description }}{{ . }}{{ else }}{{ .Summary | plainify | htmlUnescape | truncate 260 }}{{ end }}</p>
+      <div class="featured-bottom">
+        <div class="topic-list">{{ range first 3 (.GetTerms "topics") }}<span>{{ .LinkTitle }}</span>{{ end }}</div>
+        <span class="text-link">Read the dispatch <b>↗</b></span>
+      </div>
+    </div>
+  </article>
+</section>
+{{ end }}
+
+<section class="recent shell">
+  <div class="section-heading">
+    <div><span class="section-number">02</span><span class="eyebrow">From the notebook</span></div>
+  </div>
+  <div class="article-grid">
+    {{ range first 6 (after 1 $posts) }}{{ partial "article-card.html" . }}{{ end }}
+  </div>
+</section>
+
+<section class="topic-explorer shell">
+  <div class="section-heading">
+    <div><span class="section-number">03</span><span class="eyebrow">Follow a thread</span></div>
+    <a href="{{ "/topics/" | relURL }}">Every topic <span>↗</span></a>
+  </div>
+  <div class="topic-cloud">
+    {{ range first 10 site.Taxonomies.topics.ByCount }}
+      <a href="{{ .Page.RelPermalink }}"><span>{{ .Page.LinkTitle }}</span><b>{{ .Count | printf "%02d" }}</b></a>
+    {{ end }}
+  </div>
+</section>
+
+<section class="contribute shell">
+  <div>
+    <span class="eyebrow"><i></i> This is a working notebook</span>
+    <h2>Found a stale command<br>or a better way?</h2>
+  </div>
+  <div>
+    <p>Every article lives in Git. Corrections, context, and respectful disagreement are welcome.</p>
+    <a class="button button-primary" href="{{ site.Params.repository }}" target="_blank" rel="noopener">Open the repository <span>↗</span></a>
+  </div>
+</section>
+{{ end }}

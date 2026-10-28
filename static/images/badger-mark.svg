@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="BadgerOps mark">
+  <rect width="64" height="64" rx="17" fill="#151a18"/>
+  <path d="M13 25 7 16l13 3M51 25l6-9-13 3" fill="#d9d5c9" stroke="#d9d5c9" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+  <path d="M14 25c2-9 9-14 18-14s16 5 18 14l-3 19-15 9-15-9Z" fill="#e8e4d9"/>
+  <path d="M27 12h10l4 34-9 7-9-7Z" fill="#656d68"/>
+  <path d="m14 27 13 4-4 12-7-2Zm36 0-13 4 4 12 7-2Z" fill="#202624"/>
+  <circle cx="21.5" cy="32" r="2.2" fill="#b9f542"/>
+  <circle cx="42.5" cy="32" r="2.2" fill="#b9f542"/>
+  <path d="m28 42 4-2.5 4 2.5-4 4Z" fill="#111514"/>
+</svg>

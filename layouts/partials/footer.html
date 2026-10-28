@@ -1,0 +1,26 @@
+<footer class="site-footer">
+  <div class="shell footer-grid">
+    <div>
+      <a class="brand footer-brand" href="{{ site.Home.RelPermalink }}">
+        <img src="{{ "images/badger-mark.svg" | relURL }}" width="34" height="34" alt="">
+        <span class="brand-copy"><strong>BadgerOps</strong><small>Useful mistakes, documented.</small></span>
+      </a>
+    </div>
+    <div class="footer-links">
+      <span>Explore</span>
+      <a href="{{ "/posts/" | relURL }}">All writing</a>
+      <a href="{{ "/topics/" | relURL }}">Topics</a>
+      <a href="{{ "/index.xml" | relURL }}">RSS feed</a>
+    </div>
+    <div class="footer-links">
+      <span>Elsewhere</span>
+      <a href="{{ site.Params.github }}" target="_blank" rel="me noopener">GitHub ↗</a>
+      <a href="{{ site.Params.social }}" target="_blank" rel="me noopener">X / Twitter ↗</a>
+      <a href="{{ site.Params.repository }}" target="_blank" rel="noopener">Improve this site ↗</a>
+    </div>
+  </div>
+  <div class="shell footer-base">
+    <span>© {{ now.Year }} BadgerOps</span>
+    <span class="status"><i></i> Built in the open with Hugo</span>
+  </div>
+</footer>

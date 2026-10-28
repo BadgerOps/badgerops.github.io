@@ -1,0 +1,12 @@
+---
+title: "Dachau"
+slug: "dachau"
+date: 2024-03-19T14:00:47Z
+lastmod: 2024-03-19T14:00:47Z
+draft: false
+description: "Last weekend, we traveled to the Alpine town of Garmisch, explored the beautiful Neuschwanstein Castle, and on our return trip to Stuttgart, visited the Dachau memorial. Words cannot express what we experienced while walking through the…"
+topics: []
+aliases: ["/2024/03/19/dachau/"]
+migration_source: ghost
+---
+<p>Last weekend, we traveled to the Alpine town of <a href="https://en.wikipedia.org/wiki/Garmisch-Partenkirchen" rel="noreferrer">Garmisch</a>, explored the beautiful <a href="https://www.neuschwanstein.de/" rel="noreferrer">Neuschwanstein Castle</a>, and on our return trip to Stuttgart, visited the <a href="https://www.dachau.de/en/tourism/concentration-camp-memorial-site.html" rel="noreferrer">Dachau</a> memorial.</p><p>Words cannot express what we experienced while walking through the memorial site.</p><p>The utter disregard for humanity.</p><p>The engineered, <em>optimized</em> methodology for corralling, oppressing, <em>destroying</em> an entire group of people was evident. This was not just thrown together.<br>How does this happen? In retrospect, it is easy to see the slow fade that rolled into a massive swing towards something so despicable it is impossible to dwell on it without a overwhelming sense of despair.</p><p>How do we stop from continuously repeating this type of behavior? Why do humans inevitably generate "reasons" to attack,  oppress, destroy others?</p><p>What can <em>I</em> do to help? Individually, not much - not on a global scale. Together? Still, not much. We're up against geopolitical structures that simply do not want or care to actually do the morally right things. It doesn't generate power or money - but maybe this is just me being jaded, cynical and using those excuses to decouple my emotions from my observations.</p><p>I don't have answers. But I am more thoughtful than I was yesterday, and with that maybe am better equipped to be a positive force in this world. Is the phrase "Be the change you wish to see in the world" over used? Maybe, again, from a cynical point of view.</p><p>Choose not to be cynical, choose not to be jaded. Choose to care.</p><p>So.</p><p>What am I going to do about this? I don't know. Focus more on being a better Husband, Father, Brother, Friend for one. Looking for opportunities to do something <em>outside myself</em> for other people.  I can't stop the bad, but I can spread good.</p><p>Be the change you wish to see in the world.</p>

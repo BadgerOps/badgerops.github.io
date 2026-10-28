@@ -1,0 +1,50 @@
+{{ define "main" }}
+<article class="post">
+  <header class="post-header shell-narrow">
+    {{ if eq .Section "posts" }}<a class="back-link" href="{{ "/posts/" | relURL }}">← All field notes</a>{{ else }}<a class="back-link" href="{{ site.Home.RelPermalink }}">← Back home</a>{{ end }}
+    <div class="topic-list">{{ range .GetTerms "topics" }}<a href="{{ .RelPermalink }}">{{ .LinkTitle }}</a>{{ end }}</div>
+    <h1>{{ .Title }}</h1>
+    {{ with .Description }}<p class="post-deck">{{ . }}</p>{{ end }}
+    <div class="post-meta">
+      <div><span>Published</span><time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "January 2, 2006" }}</time></div>
+      <div><span>Reading time</span><b>{{ .ReadingTime }} minutes</b></div>
+      {{ if ne (.Lastmod.Format "2006-01-02") (.Date.Format "2006-01-02") }}<div><span>Updated</span><b>{{ .Lastmod.Format "January 2, 2006" }}</b></div>{{ end }}
+    </div>
+  </header>
+
+  <div class="post-rule shell"><span></span><i></i><span></span></div>
+
+  <div class="article-shell shell">
+    <aside class="article-rail">
+      <div class="rail-sticky">
+        <span>On this page</span>
+        {{ .TableOfContents }}
+        <button type="button" data-copy-url>Copy article link</button>
+      </div>
+    </aside>
+    <div class="post-content">
+      {{ .Content }}
+    </div>
+  </div>
+
+  <footer class="post-footer shell-narrow">
+    <div class="author-card">
+      <img src="{{ "images/badger-mark.svg" | relURL }}" width="54" height="54" alt="">
+      <div><span>Written by</span><strong>BadgerOps</strong><p>Building systems, finding edges, and leaving notes for the next operator.</p></div>
+    </div>
+    <div class="post-actions">
+      {{ $editPath := cond (eq .Section "posts") (printf "content/posts/%s" .File.LogicalName) (printf "content/%s" .File.LogicalName) }}
+      <a href="{{ site.Params.repository }}/edit/main/{{ $editPath }}" target="_blank" rel="noopener">Suggest an edit ↗</a>
+      <button type="button" data-copy-url>Copy link</button>
+    </div>
+  </footer>
+
+  {{ $related := site.RegularPages.Related . | first 3 }}
+  {{ with $related }}
+  <section class="related shell">
+    <div class="section-heading"><div><span class="section-number">↳</span><span class="eyebrow">Keep following the thread</span></div></div>
+    <div class="article-grid">{{ range . }}{{ partial "article-card.html" . }}{{ end }}</div>
+  </section>
+  {{ end }}
+</article>
+{{ end }}

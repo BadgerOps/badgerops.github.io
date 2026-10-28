@@ -1,0 +1,14 @@
+{{ define "main" }}
+<header class="page-hero shell">
+  <div class="eyebrow"><i></i> Browse by subject</div>
+  <h1>Topic index</h1>
+  <p>Infrastructure has a long memory. Pick a thread and follow it through the years.</p>
+</header>
+<section class="topics-page shell">
+  <div class="topic-cloud topic-cloud-large">
+    {{ range .Data.Terms.ByCount }}
+      <a href="{{ .Page.RelPermalink }}"><span>{{ .Page.LinkTitle }}</span><b>{{ .Count | printf "%02d" }}</b></a>
+    {{ end }}
+  </div>
+</section>
+{{ end }}

@@ -1,0 +1,26 @@
+{{ define "main" }}
+<header class="page-hero shell">
+  <div class="eyebrow"><i></i> {{ if eq .Kind "taxonomy" }}Topic archive{{ else }}The complete log{{ end }}</div>
+  <h1>{{ if eq .Section "posts" }}Field notes{{ else }}{{ .Title }}{{ end }}</h1>
+  <p>{{ if eq .Section "posts" }}Experiments, walkthroughs, and postmortems from the systems that made it out of the homelab.{{ else }}Everything filed under {{ .Title }}.{{ end }}</p>
+</header>
+
+<section class="archive shell">
+  {{ $pages := .Pages.ByDate.Reverse }}
+  {{ $paginator := .Paginate $pages }}
+  <div class="archive-toolbar">
+    <span>{{ len $pages }} {{ cond (eq (len $pages) 1) "note" "notes" }}</span>
+    <button type="button" data-search-open>Filter the archive <kbd>/</kbd></button>
+  </div>
+  <div class="article-grid archive-grid">
+    {{ range $paginator.Pages }}{{ partial "article-card.html" . }}{{ end }}
+  </div>
+  {{ if gt $paginator.TotalPages 1 }}
+  <nav class="pagination" aria-label="Pagination">
+    {{ with $paginator.Prev }}<a href="{{ .URL }}">← Newer</a>{{ else }}<span></span>{{ end }}
+    <span>{{ $paginator.PageNumber }} / {{ $paginator.TotalPages }}</span>
+    {{ with $paginator.Next }}<a href="{{ .URL }}">Older →</a>{{ else }}<span></span>{{ end }}
+  </nav>
+  {{ end }}
+</section>
+{{ end }}

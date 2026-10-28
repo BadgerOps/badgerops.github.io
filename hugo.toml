@@ -1,48 +1,72 @@
-baseURL = 'https://blog.badgerops.net/'
-languageCode = 'en-us'
-title = "BadgerOps' Blog"
-theme = 'hugo-bearblog'
-
-[params]
-  dateform        = "Jan 2, 2006"
-  dateformShort   = "Jan 2"
-  dateformNum     = "2006-01-02"
-  dateformNumTime = "2006-01-02 15:04"
-# The "description" of your website. This is used in the meta data of your generated html.
-  description = "Hugo + Bear = :heart:"
-  # Subtitle for home
-  homeSubtitle = "A simple and beautiful blog"
-
-  # Set disableReadOtherPosts to true in order to hide the links to other posts.
-  disableReadOtherPosts = false
-
-  # Enable sharing buttons, if you like
-  enableSharingButtons = true
-  
-  # Show a global language switcher in the navigation bar
-  enableGlobalLanguageMenu = true
-
-  keywords = "homepage, blog"
-  images = [""]
-
-# Generate a nice robots.txt for SEO
+baseURL = "https://blog.badgerops.net/"
+locale = "en-US"
+title = "BadgerOps"
 enableRobotsTXT = true
+enableGitInfo = false
+summaryLength = 34
+
+[pagination]
+  pagerSize = 9
+
+[permalinks]
+  posts = "/:slug/"
 
 [taxonomies]
-    category = "blog"
-    tag      = "tags"
-    series   = "series"
+  topic = "topics"
 
+[outputs]
+  home = ["HTML", "RSS", "SearchIndex"]
+  section = ["HTML", "RSS"]
+  taxonomy = ["HTML", "RSS"]
 
-  # And you can even create generic menu
-  [[menu.main]]
-    identifier = "blog"
-    name       = "Blog"
-    url        = "/posts"
+[outputFormats.SearchIndex]
+  mediaType = "application/json"
+  baseName = "index"
+  isPlainText = true
+  notAlternative = true
 
-# Generate "Bearblog"-like URLs !only!, see https://bearblog.dev/.
-#disableKinds = ["taxonomy"]
-ignoreErrors = ["error-disable-taxonomy"]
-[permalinks]
-  blog = "/:slug/"
-  tags = "/blog/:slug"
+[params]
+  description = "Field notes on infrastructure, security, homelabs, open source, and the occasional useful mistake."
+  author = "BadgerOps"
+  github = "https://github.com/BadgerOps"
+  social = "https://x.com/BadgerOps"
+  repository = "https://github.com/BadgerOps/badgerops.github.io"
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    noClasses = false
+    lineNos = false
+    guessSyntax = true
+
+[privacy]
+  [privacy.x]
+    enableDNT = true
+  [privacy.youtube]
+    privacyEnhanced = true
+
+[services]
+  [services.rss]
+    limit = 20
+
+[[menus.main]]
+  name = "Writing"
+  pageRef = "/posts"
+  weight = 10
+
+[[menus.main]]
+  name = "Topics"
+  pageRef = "/topics"
+  weight = 20
+
+[[menus.main]]
+  name = "About"
+  pageRef = "/about"
+  weight = 30
+
+[[menus.main]]
+  name = "GitHub"
+  url = "https://github.com/BadgerOps"
+  weight = 40

@@ -1,0 +1,15 @@
+<article class="article-card">
+  <a class="card-link" href="{{ .RelPermalink }}" aria-label="Read {{ .Title }}"></a>
+  <div class="card-topline">
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
+    <span>{{ .ReadingTime }} min</span>
+  </div>
+  <h3>{{ .Title }}</h3>
+  <p>{{ with .Description }}{{ . }}{{ else }}{{ .Summary | plainify | htmlUnescape | truncate 180 }}{{ end }}</p>
+  <div class="card-footer">
+    <div class="topic-list">
+      {{ range first 2 (.GetTerms "topics") }}<span>{{ .LinkTitle }}</span>{{ end }}
+    </div>
+    <span class="read-arrow" aria-hidden="true">↗</span>
+  </div>
+</article>
