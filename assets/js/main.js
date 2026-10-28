@@ -29,7 +29,7 @@
         const response = await fetch(root.dataset.searchIndex);
         searchIndex = await response.json();
       } catch {
-        results.innerHTML = '<p class="search-help">The search index could not be loaded. Try the topic index instead.</p>';
+        renderHelp('The search index could not be loaded. Try the topic index instead.');
       }
     }
   };
@@ -57,7 +57,7 @@
   input?.addEventListener('input', () => {
     const query = input.value.trim().toLowerCase();
     if (!query) {
-      results.innerHTML = '<p class="search-help">Search titles, topics, summaries, and article text.</p>';
+      renderHelp('Search titles, topics, summaries, and article text.');
       return;
     }
     if (!searchIndex) return;
@@ -74,20 +74,34 @@
       .sort((a, b) => b.score - a.score)
       .slice(0, 8);
 
-    results.innerHTML = matches.length
-      ? matches.map(({ item }) => `
-          <a class="search-result" href="${item.url}">
-            <span>${item.date}${item.topics?.length ? ` · ${item.topics.slice(0, 2).join(' / ')}` : ''}</span>
-            <strong>${escapeHtml(item.title)}</strong>
-            <p>${escapeHtml(item.description)}</p>
-          </a>`).join('')
-      : '<p class="search-help">No matching field notes. Try a broader term.</p>';
+    if (!matches.length) {
+      renderHelp('No matching field notes. Try a broader term.');
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    matches.forEach(({ item }) => {
+      const link = document.createElement('a');
+      const metadata = document.createElement('span');
+      const title = document.createElement('strong');
+      const description = document.createElement('p');
+
+      link.className = 'search-result';
+      link.href = item.url;
+      metadata.textContent = `${item.date}${item.topics?.length ? ` · ${item.topics.slice(0, 2).join(' / ')}` : ''}`;
+      title.textContent = item.title;
+      description.textContent = item.description;
+      link.append(metadata, title, description);
+      fragment.append(link);
+    });
+    results.replaceChildren(fragment);
   });
 
-  function escapeHtml(value = '') {
-    const element = document.createElement('div');
-    element.textContent = value;
-    return element.innerHTML;
+  function renderHelp(message) {
+    const help = document.createElement('p');
+    help.className = 'search-help';
+    help.textContent = message;
+    results.replaceChildren(help);
   }
 
   document.querySelectorAll('[data-copy-url]').forEach((button) => {
