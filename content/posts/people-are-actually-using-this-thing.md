@@ -1,5 +1,6 @@
 ---
-title: "People Are Actually Using This Thing"
+
+## title: "People Are Actually Using This Thing"
 slug: "people-are-actually-using-this-thing"
 date: 2026-10-28T12:35:00Z
 lastmod: 2026-10-28T12:35:00Z
@@ -8,7 +9,6 @@ description: "The UniFi provider went from 153 downloads in May to about 23,600.
 topics: ["Homelab", "Open Source", "Terraform", "UniFi"]
 aliases: ["/2026/10/28/people-are-actually-using-this-thing/"]
 migration_source: ghost
----
 
 *(Or, how my homelab provider turned into actual open source maintenance)*
 
@@ -28,16 +28,16 @@ The provider is better for it. Quite a bit better, actually.
 
 I want to call out a few people before getting into the code:
 
-* [thewhit](https://github.com/thewhit) added Enterprise WiFi, WPA2 PPSK, and a configurable HTTP timeout. Those were substantial additions, complete with tests and examples.
-* [dreh23](https://github.com/dreh23) fixed the Site Manager cloud connector URL handling and found GNU-specific `awk` hiding in the documentation scripts.
-* [michaelpeterswa](https://github.com/michaelpeterswa) filed the kind of bug reports maintainers dream about: config, output, controller behavior, and enough detail to reproduce the problem.
+* [thewhit](https://github.com/thewhit) added Enterprise WiFi, WPA2 PPSK, and a configurable HTTP timeout. Those were solid additions, complete with tests and examples.
+* [dreh23](https://github.com/dreh23) fixed the Site Manager cloud connector URL handling and found GNU-specific `awk` hiding in the documentation scripts, breaking cross-platform doc building.
+* [michaelpeterswa](https://github.com/michaelpeterswa) filed the kind of bug reports maintainers dream about: config, output, controller behavior, and enough detail to reproduce the problem (Thank you!).
 * [hectellian](https://github.com/hectellian) helped with OpenTofu Registry and GPG signing support.
 
 There have been plenty of other issues, comments, and test results along the way. Thank you for taking the time to send them. Every controller behaves slightly differently, and I only own so many UniFi devices. (Still too many, according to my wife.)
 
 ## The provider config grew a timeout
 
-One of the first community fixes was delightfully practical. A UniFi Network application can stop answering the API for a few minutes while it reprovisions devices after a WiFi change. The controller stays up, the port stays open, and the provider sits there until the hardcoded 30 second HTTP timeout expires.
+One of the first community fixes was just practical. A UniFi Network application can stop answering the API for a few minutes while it reprovisions devices after a WiFi change. The controller stays up, the port stays open, and the provider sits there until the hardcoded 30 second HTTP timeout expires.
 
 You end up with this:
 
@@ -87,7 +87,7 @@ Simple fix. Very useful. Exactly the sort of thing I would not have noticed whil
 
 ## Enterprise WiFi and PPSK
 
-The big feature contribution was Enterprise WiFi and private pre-shared keys. I had neither in my original setup, so they were very much outside the first version of the provider.
+The big feature contribution was Enterprise WiFi and private pre-shared keys. I had neither in my original setup, so they were very much outside the first version of the provider, which was home/lab oriented.
 
 Enterprise WiFi looks up an existing RADIUS profile and references it from the broadcast:
 
