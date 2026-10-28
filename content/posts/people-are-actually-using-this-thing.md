@@ -1,6 +1,5 @@
 ---
-
-## title: "People Are Actually Using This Thing"
+title: "People Are Actually Using This Thing"
 slug: "people-are-actually-using-this-thing"
 date: 2026-10-28T12:35:00Z
 lastmod: 2026-10-28T12:35:00Z
@@ -9,6 +8,7 @@ description: "The UniFi provider went from 153 downloads in May to about 23,600.
 topics: ["Homelab", "Open Source", "Terraform", "UniFi"]
 aliases: ["/2026/10/28/people-are-actually-using-this-thing/"]
 migration_source: ghost
+---
 
 *(Or, how my homelab provider turned into actual open source maintenance)*
 
