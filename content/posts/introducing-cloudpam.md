@@ -2,7 +2,7 @@
 title: "Introducing CloudPAM: IPAM that knows about your cloud"
 slug: "introducing-cloudpam"
 date: 2026-10-31T12:00:00Z
-draft: true
+draft: false
 description: "CloudPAM keeps planned address pools and discovered AWS and GCP resources in the same place, so overlaps and drift show up before deployment."
 topics: ["networking", "IPAM", "AWS", "GCP", "open-source", "tools"]
 ---
