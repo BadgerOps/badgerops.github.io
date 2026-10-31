@@ -24,7 +24,7 @@ That is the job I wanted a tool for. The plan and the cloud, in the same place, 
 * **Drift.** Compare discovered resources with managed pools. The Drift Detection page lists unmanaged resources, CIDR mismatches, and orphaned discovered pools. Resolve and ignore record your decision on each item.
 * **Schema Planner.** Lay out a hierarchy, run the conflict check, and apply it.
 * **Auth.** Local users, sessions, API keys, custom roles, and optional OIDC.
-* **Terraform.** A separate provider manages pools and accounts. `endpoint` and `api_key` are the provider settings (or `CLOUDPAM_ENDPOINT` and `CLOUDPAM_API_KEY`). Keys use the `cpam_` prefix. Create one under **Settings → API Keys**.
+* **Terraform.** A separate provider manages pools and accounts. `endpoint` and `api_key` are the provider settings (or `CLOUDPAM_ENDPOINT` and `CLOUDPAM_API_KEY`). Keys use the `cpam_` prefix. Create one under **Administration → API Keys** (`/config/api-keys`).
 
 ```hcl
 provider "cloudpam" {
@@ -48,10 +48,11 @@ This part needs no cloud credentials.
 git clone https://github.com/BadgerOps/cloudpam.git
 cd cloudpam
 nix develop
+just ui-build
 just dev
 ```
 
-`just dev` sets `DEV_MODE=1` and starts the in-memory server at [http://localhost:8080](http://localhost:8080). From the same shell, `DEV_MODE=1 go run ./cmd/cloudpam` is the same server without Just. Quit it and the data is gone. That is what dev mode is for.
+`just ui-build` compiles the React UI into `web/dist`, which the binary embeds. A fresh clone ships a placeholder page and no built assets, so `just dev` alone comes up with an empty UI. `just dev` sets `DEV_MODE=1` and starts the in-memory server at [http://localhost:8080](http://localhost:8080). From the same shell, after that UI build, `DEV_MODE=1 go run ./cmd/cloudpam` is the same server without Just. Quit it and the data is gone. That is what dev mode is for.
 
 First boot is a setup form. Create the admin account, sign in, and you land on Address Pools.
 
@@ -73,11 +74,11 @@ Allocated Blocks is the designed space: the ranges you meant to hand out, separa
 
 Everything in this section comes from a seeded demo. Playwright loaded a throwaway in-memory server with managed pools (`Corp Supernet`, `Prod East VPC`, `Edge Transit`) and discovered resources on a cloud account named `prod-platform`. I did that so the import and conflict views had something to show. It is a recording of demo data.
 
-A real AWS or GCP account is a different setup: host credentials, an IAM role, or the standalone agent. That lives in [docs/DISCOVERY.md](https://github.com/BadgerOps/cloudpam/blob/master/docs/DISCOVERY.md).
+A real AWS or GCP account is a different setup. AWS uses an IAM role or the standalone agent. GCP uses Application Default Credentials with the server collector. That lives in [docs/DISCOVERY.md](https://github.com/BadgerOps/cloudpam/blob/master/docs/DISCOVERY.md).
 
 ![Seeded cloud accounts](/images/cloudpam/accounts.png)
 
-On **Cloud Discovery**, choose `prod-platform`, select the resources, and click **Preview Import** before anything becomes a pool. The preview marks each row importable or blocked.
+On **Cloud Discovery**, choose `prod-platform`, select the resources, and click **Preview Import** before anything becomes a pool. The preview marks each row importable, conflict, blocked, or link-only.
 
 ![Resources selected for import](/images/cloudpam/discovery-import-selection.png)
 
