@@ -3,28 +3,74 @@ title: "Introducing CloudPAM: IPAM that knows about your cloud"
 slug: "introducing-cloudpam"
 date: 2026-10-31T12:00:00Z
 draft: true
-description: "CloudPAM is cloud-native IP address management for multi-account AWS and GCP — hierarchical pools, discovery, drift, and a Terraform provider — without pretending spreadsheets are a plan."
+description: "CloudPAM keeps planned address pools and discovered AWS and GCP resources in the same place, so overlaps and drift show up before deployment."
 topics: ["networking", "IPAM", "AWS", "GCP", "open-source", "tools"]
 ---
 
 I have lost count of the spreadsheets named `ip-plan-FINAL-v7.xlsx`.
 
-The sheet says `10.20.0.0/16` belongs to prod. Somewhere in AWS, a VPC in an account nobody added to the sheet is already using `10.20.4.0/24`. The IPAM tool, when there is one, still treats the cloud as a column a person types into. By the time the overlap shows up, two teams have built on it.
+The spreadsheet says `10.20.0.0/16` belongs to production. Meanwhile, a VPC in an account nobody added to the spreadsheet is already using `10.20.4.0/24`. Everything looks fine until two teams try to connect their networks and discover that they picked the same address space.
 
-That is the job I wanted a tool for. The plan and the cloud, in the same place, with the difference written down.
+That gap between the plan and the cloud is why I wrote [CloudPAM](https://github.com/BadgerOps/cloudpam). I wanted one place to keep the ranges we intended to use, the resources the cloud providers say actually exist, and the differences between the two.
 
-## What it is
+## So, what is CloudPAM?
 
-[CloudPAM](https://github.com/BadgerOps/cloudpam) is IP address management for multi-account AWS and GCP. You keep a hierarchy of pools, which is the plan, and a separate record of what the cloud APIs actually returned. The server is Go. The UI is React, compiled into that same binary, and the container image is that binary. PostgreSQL is the production store. SQLite covers a single node. The dev server can run entirely in memory.
+CloudPAM is an IP address management tool for AWS and GCP environments. You build a hierarchy of managed pools, then discovery records what the cloud APIs return without adding those resources to the plan.
 
-## What it does
+The server is written in Go, with the React UI embedded in the same binary. The container packages that binary in a minimal runtime image. PostgreSQL is the production store, SQLite works for a single-node deployment, and the development server can run entirely in memory.
 
-* **Hierarchical pools.** Supernets, regions, app tiers: whatever shape matches the network. A child CIDR has to sit inside its parent, and sibling ranges are checked for overlap.
-* **Discovery for AWS and GCP.** AWS covers VPCs, subnets, Elastic IPs, and Organizations, including a standalone agent. GCP covers networks, subnetworks, and external IPs through the server collector.
-* **Drift.** Compare discovered resources with managed pools. The Drift Detection page lists unmanaged resources, CIDR mismatches, and orphaned discovered pools. Resolve and ignore record your decision on each item.
-* **Schema Planner.** Lay out a hierarchy, run the conflict check, and apply it.
-* **Auth.** Local users, sessions, API keys, custom roles, and optional OIDC.
-* **Terraform.** A separate provider manages pools and accounts. `endpoint` and `api_key` are the provider settings (or `CLOUDPAM_ENDPOINT` and `CLOUDPAM_API_KEY`). Keys use the `cpam_` prefix. Create one under **Administration → API Keys** (`/config/api-keys`).
+Today, CloudPAM can:
+
+* Build hierarchical address pools and reject child ranges outside their parent or overlapping sibling ranges.
+* Discover VPCs, subnets, Elastic IPs, and AWS Organizations accounts. The GCP collector handles networks, subnetworks, and external IPs.
+* Compare discovered resources with managed pools and record whether you resolved or ignored each drift item.
+* Lay out a hierarchy in the Schema Planner, check it for conflicts, and apply it.
+* Authenticate local users or use OIDC, with sessions, API keys, and custom roles.
+* Manage pools and cloud accounts through the Terraform provider.
+
+The AWS discovery agent is a separate binary for accounts where running discovery from the CloudPAM server does not make sense. GCP discovery currently runs from the server using Application Default Credentials. More on that below.
+
+## Run it locally
+
+You do not need an AWS or GCP account for this part. The development server uses an in-memory store, so it is a safe way to poke at the pool model without setting up a database.
+
+```bash
+git clone https://github.com/BadgerOps/cloudpam.git
+cd cloudpam
+nix develop
+just ui-build
+just dev
+```
+
+Do not skip `just ui-build` on a fresh clone. The Go binary embeds whatever is under `web/dist`, and the repository only carries a placeholder page. `just ui-build` compiles the React application before `just dev` starts the server at [http://localhost:8080](http://localhost:8080).
+
+If you do not use Just, the server command is:
+
+```bash
+DEV_MODE=1 go run ./cmd/cloudpam
+```
+
+That still needs the UI build first. Also, the data disappears when you stop the process. That is useful for this walkthrough and less useful for anything you care about keeping.
+
+The first visit gives you a setup form. Create the initial admin user, sign in, and CloudPAM drops you on the Address Pools page.
+
+<img src="/images/cloudpam/setup-login.gif" alt="First-boot setup and sign-in" width="1280" height="720" loading="lazy" decoding="async">
+
+Start with a root pool. I used `Corp Supernet` with `10.0.0.0/8` and no parent. Then create a second pool with a CIDR inside that range and select `Corp Supernet` as its parent.
+
+<img src="/images/cloudpam/pools.png" alt="Address pools hierarchy in CloudPAM" width="2560" height="1800" loading="lazy" decoding="async">
+
+The clip below uses my seeded demo data and adds `Demo App Tier` (`10.20.10.0/24`) below `Prod East VPC`. One small UI oddity: the table starts by showing root pools. Searching for the new child brings it into the table after it is created.
+
+<img src="/images/cloudpam/create-pool.gif" alt="Creating a child pool" width="1280" height="720" loading="lazy" decoding="async">
+
+Allocated Blocks shows the address space you meant to hand out. Cloud discovery stays separate, which is important because finding a subnet in AWS should not automatically make that subnet part of your IP plan.
+
+<img src="/images/cloudpam/blocks.png" alt="Allocated blocks in CloudPAM" width="2560" height="1800" loading="lazy" decoding="async">
+
+## Managing pools with Terraform
+
+If you would rather keep the plan in code, the Terraform provider currently manages pools and cloud accounts. Create an API key under **Administration > API Keys** (`/config/api-keys`), then configure the provider with the endpoint and key:
 
 ```hcl
 provider "cloudpam" {
@@ -38,77 +84,57 @@ resource "cloudpam_pool" "corp" {
 }
 ```
 
-`cloudpam_account` is the other v1 resource, for the cloud accounts those pools belong to. Discovery runs, drift items, and users stay outside the provider.
+You can also set `CLOUDPAM_ENDPOINT` and `CLOUDPAM_API_KEY` instead of putting those values in the provider block. CloudPAM keys start with `cpam_`.
 
-## Run it locally
+The other v1 resource is `cloudpam_account`. Discovery runs, drift items, users, and other operational state stay outside Terraform.
 
-This part needs no cloud credentials.
+## Trying cloud discovery without cloud credentials
 
-```bash
-git clone https://github.com/BadgerOps/cloudpam.git
-cd cloudpam
-nix develop
-just ui-build
-just dev
-```
+The rest of the screenshots use a throwaway server with seeded data. I loaded managed pools named `Corp Supernet`, `Prod East VPC`, and `Edge Transit`, along with discovered resources attached to a fake account named `prod-platform`. Nothing in this walkthrough contacted a real AWS or GCP account.
 
-`just ui-build` compiles the React UI into `web/dist`, which the binary embeds. A fresh clone ships a placeholder page and no built assets, so `just dev` alone comes up with an empty UI. `just dev` sets `DEV_MODE=1` and starts the in-memory server at [http://localhost:8080](http://localhost:8080). From the same shell, after that UI build, `DEV_MODE=1 go run ./cmd/cloudpam` is the same server without Just. Quit it and the data is gone. That is what dev mode is for.
+A real AWS account uses the default credential chain, an IAM role, or the standalone agent. GCP uses Application Default Credentials on the CloudPAM server. The setup details and required permissions are in [docs/DISCOVERY.md](https://github.com/BadgerOps/cloudpam/blob/master/docs/DISCOVERY.md).
 
-First boot is a setup form. Create the admin account, sign in, and you land on Address Pools.
+<img src="/images/cloudpam/accounts.png" alt="Seeded cloud accounts" width="2560" height="1800" loading="lazy" decoding="async">
 
-![First-boot setup and sign-in](/images/cloudpam/setup-login.gif)
+On **Cloud Discovery**, select the account and the resources you want to import, then click **Preview Import**. Nothing becomes a managed pool until you apply that preview.
 
-A fresh server has an empty tree. Use **New Pool** for the supernet (`Corp Supernet`, `10.0.0.0/8`, no parent), then **New Pool** again for a child inside it. Fill in the name, the CIDR, and the parent, then **Create Pool**.
+<img src="/images/cloudpam/discovery-import-selection.png" alt="Resources selected for import" width="2560" height="2400" loading="lazy" decoding="async">
 
-The stills and the clip below were captured on the seeded demo, so the tree is already populated. The clip adds `Demo App Tier` (`10.20.10.0/24`) under the seeded `Prod East VPC`. The dialog is the same one you get on a fresh server. The pools table lists root pools until the search box has text, which is why the clip searches for the new name before the child row appears.
+The preview labels each resource as importable, conflicting, blocked, or link-only. This is the part I care about: you get to see what CloudPAM plans to do before it changes the managed pool tree.
 
-![Address pools hierarchy in CloudPAM](/images/cloudpam/pools.png)
+<img src="/images/cloudpam/discovery-import-preview.png" alt="Import preview" width="2048" height="856" loading="lazy" decoding="async">
 
-![Creating a child pool](/images/cloudpam/create-pool.gif)
+**Apply import** writes the rows that passed the checks. This clip runs through the whole selection, preview, and import against the seeded account:
 
-Allocated Blocks is the designed space: the ranges you meant to hand out, separate from what discovery later observes.
+<img src="/images/cloudpam/discovery-import.gif" alt="Selecting seeded resources and applying the import" width="1280" height="720" loading="lazy" decoding="async">
 
-![Allocated blocks in CloudPAM](/images/cloudpam/blocks.png)
+After the import, the Network tab puts managed pools and discovered objects into one hierarchy. The Conflicts view calls out duplicate CIDRs and broken nesting instead of leaving you to find them during a routing change.
 
-## Discovery, with seeded data
+<img src="/images/cloudpam/discovery-network-hierarchy.png" alt="Merged network hierarchy" width="2560" height="3400" loading="lazy" decoding="async">
 
-Everything in this section comes from a seeded demo. Playwright loaded a throwaway in-memory server with managed pools (`Corp Supernet`, `Prod East VPC`, `Edge Transit`) and discovered resources on a cloud account named `prod-platform`. I did that so the import and conflict views had something to show. It is a recording of demo data.
+<img src="/images/cloudpam/discovery-network-conflicts.png" alt="Conflict review" width="2560" height="4600" loading="lazy" decoding="async">
 
-A real AWS or GCP account is a different setup. AWS uses an IAM role or the standalone agent. GCP uses Application Default Credentials with the server collector. That lives in [docs/DISCOVERY.md](https://github.com/BadgerOps/cloudpam/blob/master/docs/DISCOVERY.md).
+Drift Detection compares the two sides again and reports unmanaged resources, CIDR mismatches, and discovered pools that no longer have a matching resource. **Resolve** and **Ignore** record your decision. CloudPAM does not edit the cloud resource or managed pool behind your back.
 
-![Seeded cloud accounts](/images/cloudpam/accounts.png)
+## Current sharp edges
 
-On **Cloud Discovery**, choose `prod-platform`, select the resources, and click **Preview Import** before anything becomes a pool. The preview marks each row importable, conflict, blocked, or link-only.
+I would rather write these down than pretend the project is finished:
 
-![Resources selected for import](/images/cloudpam/discovery-import-selection.png)
+* Managed pools are IPv4 only. GCP discovery can ingest an IPv6 address, but CloudPAM cannot turn it into a managed pool.
+* The account form accepts Azure, but there is no Azure collector. A sync fails with `no collector registered for provider`; you can only track the account and its pools by hand.
+* CloudPAM is a single-tenant appliance. The database contains some organization scaffolding, but it does not enforce tenant isolation.
+* Gap and fragmentation results appear in the pool detail panel. Compliance and the full analysis report are still API-only, and there is no dedicated Analysis page.
 
-![Import preview](/images/cloudpam/discovery-import-preview.png)
+There are more details in the repository's [current status document](https://github.com/BadgerOps/cloudpam/blob/master/docs/CURRENT_STATUS.md). That file is deliberately less optimistic than a feature list.
 
-**Apply import** writes the rows that are clear. The clip does that against the seed and stops on the import summary.
+## Give it a try
 
-![Selecting seeded resources and applying the import](/images/cloudpam/discovery-import.gif)
+The repository is [github.com/BadgerOps/cloudpam](https://github.com/BadgerOps/cloudpam). The [deployment guide](https://github.com/BadgerOps/cloudpam/blob/master/docs/DEPLOYMENT.md) covers Compose, Cloud Run, ECS, and Kubernetes when you are ready to keep the data.
 
-Network then shows managed pools and discovered objects in one hierarchy. Conflicts is where duplicate CIDRs and broken nesting show up. The seed is built to trip those cases.
+If the quickstart breaks, or discovery does something different from what the documentation says, please [file an issue](https://github.com/BadgerOps/cloudpam/issues). Include the provider, the error, and what you expected to happen. That will save me a good amount of guessing.
 
-![Merged network hierarchy](/images/cloudpam/discovery-network-hierarchy.png)
+Hopefully this is useful to somebody else dealing with one too many cloud accounts and one too many IP planning spreadsheets.
 
-![Conflict review](/images/cloudpam/discovery-network-conflicts.png)
-
-Drift Detection is the next page. Run a detection pass and you get the list: unmanaged resources, CIDR mismatches, orphaned discovered pools. **Resolve** and **Ignore** mark the item. There is no automatic reconciliation that edits the pool or the cloud for you.
-
-## Known limits
-
-* **IPv4 only.** IPv6 addresses are rejected for managed pools. GCP discovery can still ingest an IPv6 address, and that address cannot become a pool.
-* **Azure is selectable and cannot sync.** The account form accepts Azure. There is no Azure collector, so a sync fails with `no collector registered for provider`. You can still track an Azure account and its pools by hand.
-* **Single-tenant.** One appliance, one organization. Tenant isolation is not enforced.
-* **Analysis is an API.** Gap, fragmentation, and compliance reports are `POST /api/v1/analysis` and the routes under it. The UI has no analysis page.
-
-## If you want to try it
-
-The repo is [github.com/BadgerOps/cloudpam](https://github.com/BadgerOps/cloudpam). Production options — Compose, Cloud Run, ECS, Kubernetes — are in the [deployment guide](https://github.com/BadgerOps/cloudpam/blob/master/docs/DEPLOYMENT.md).
-
-If the quickstart misbehaves, or discovery against a real account does not match the docs, [file an issue](https://github.com/BadgerOps/cloudpam/issues). Include the provider, the error, and what you expected the pool tree to do.
-
-All for now,
+Thanks for reading!
 
 -BadgerOps
